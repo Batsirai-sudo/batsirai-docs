@@ -1,0 +1,474 @@
+---
+title: Commands
+description: Commands are the "Actions" of WebCli
+---
+
+## What are Commands?
+
+They're executable functions that perform specific operations in Elementor.
+
+Each command is a function that performs a specific action, such as ~
+- Clicking a button.
+- Entering text in a field.
+- Navigating to a different page.
+
+Think of them as the "verbs" of your application:
+- **Save** a document
+- **Create** an element
+- **Delete** a widget
+- **Navigate** to a panel
+- **Undo** an action
+
+### Commands vs Routes vs Data
+- **Commands** = "What to DO" (actions, operations)
+- **Routes** = "Where to GO" (navigation, views)
+- **Data** = "What to GET/SET" (information, state)
+
+```javascript:main.js showLineNumbers {2-6}
+// Commands - Actions
+$e.run('document/save/default');         // DO: Save the document
+$e.run('document/elements/create', {     // DO: Create an element
+    model: { elType: 'widget', widgetType: 'button' },
+	container: data.parent,
+});
+
+// Routes - Navigation
+$e.route('panel/elements');              // GO: Navigate to elements panel
+$e.route('navigator');                   // GO: Navigate to navigator
+
+// Data - Information
+$e.data.get('document');                 // GET: Document information
+$e.data.set('settings', { title: 'New Title' }); // SET: Update settings
+```
+
+---
+
+
+## Quick Start
+
+### Running Commands
+```javascript:main.js showLineNumbers
+// Basic command execution
+$e.run('command-name');
+
+// Command with arguments
+$e.run('command-name', { arg1: 'value1', arg2: 'value2' });
+
+// Command with result
+const result = $e.run('document/elements/create', {
+    model: { elType: 'widget', widgetType: 'heading' },
+    container: elementor.getPreviewContainer()
+});
+```
+
+### Discovering Commands
+```typescript:main.ts showLineNumbers
+// Get all available commands
+const allCommands = $e.commands.getAll();
+console.log('Available commands:', allCommands);
+
+// Check if a command exists
+if ($e.commands.getAll().includes('my-component/my-command')) {
+    $e.run('my-component/my-command');
+}
+
+// Get command info
+const component = $e.commands.getComponent('document/save');
+console.log('Command component:', component);
+```
+---
+
+## Command Types
+
+### 1. Simple Callback Commands
+Basic functions that execute immediately:
+
+```typescript:main.ts showLineNumbers
+class MyComponent extends $e.modules.ComponentBase {
+    getNamespace() {
+        return 'my-component';
+    }
+
+    defaultCommands() {
+        return {
+            'hello': () => {
+                console.log('Hello from command!');
+                return { message: 'Command executed' };
+            },
+
+            'greet': (args) => {
+                console.log(`Hello, ${args.name}!`);
+                return { greeting: `Hello, ${args.name}!` };
+            }
+        };
+    }
+}
+```
+
+
+### 2. CommandBase Classes
+Full-featured commands with lifecycle hooks:
+
+```typescript:main.ts showLineNumbers
+class SaveCommand extends $e.modules.CommandBase {
+    // Validate arguments before execution
+    validateArgs(args) {
+        if (!args.document) {
+            throw new Error('Document is required');
+        }
+    }
+
+    // Main command logic
+    apply(args) {
+        console.log('Saving document...', args.document);
+
+        // Simulate save operation
+        const result = this.saveDocument(args.document);
+
+        return {
+            success: true,
+            document: result,
+            timestamp: Date.now()
+        };
+    }
+
+    // Helper method
+    saveDocument(document) {
+        // Your save logic here
+        return document;
+    }
+}
+```
+
+### 3. Internal Commands
+System-level commands (extend `CommandInternalBase`):
+
+```typescript:main.ts showLineNumbers
+class CleanupCommand extends $e.modules.CommandInternalBase {
+    apply(args) {
+        // Internal cleanup operations
+        this.clearCache();
+        this.resetState();
+        return { cleaned: true };
+    }
+
+    clearCache() {
+        // Clear internal caches
+    }
+
+    resetState() {
+        // Reset internal state
+    }
+}
+```
+
+### 4. Data Commands
+Commands that work with the data layer:
+
+```javascript
+class UserDataCommand extends $e.modules.CommandData {
+    apply(args) {
+        // Data operations
+        return this.updateUserPreferences(args.preferences);
+    }
+}
+```
+
+---
+
+## Command Architecture
+
+### Command Structure
+|                                     |                                                   |
+| ----------------------------------- | ------------------------------------------------- |
+| `CommandInfra (Infrastructure)`     | ← Base infrastructure                             |
+| `CommandBase (Standard Commands)`   | ← UI commands, most common                        |
+| `CommandInternalBase (System)`      | ← Internal system commands                        |
+| `CommandData (Data Layer)`          | ← Data operations                                 |
+
+### Command Registration
+```typescript:main.ts showLineNumbers
+// Automatic registration through components
+class MyComponent extends $e.modules.ComponentBase {
+    defaultCommands() {
+        return {
+            'simple': () => console.log('Simple command'),
+            'complex': ComplexCommand  // CommandBase class
+        };
+    }
+}
+
+// Manual registration
+$e.commands.register('my-component', 'manual-command', (args) => {
+    console.log('Manually registered command');
+});
+```
+
+---
+
+## Creating Commands
+
+### Step 1: Simple Command
+```javascript
+class QuickActionsComponent extends $e.modules.ComponentBase {
+    getNamespace() {
+        return 'quick-actions';
+    }
+
+    defaultCommands() {
+        return {
+            // Simple notification command
+            'notify': (args) => {
+                const message = args.message || 'Default notification';
+                alert(message);
+                return { sent: true, message };
+            },
+
+            // Log command with timestamp
+            'log': (args) => {
+                const entry = {
+                    message: args.message,
+                    level: args.level || 'info',
+                    timestamp: new Date().toISOString()
+                };
+                console.log(`[${entry.level.toUpperCase()}] ${entry.message}`);
+                return entry;
+            }
+        };
+    }
+}
+
+// Register and use
+$e.components.register(new QuickActionsComponent());
+
+// Usage
+$e.run('quick-actions/notify', { message: 'Hello World!' });
+$e.run('quick-actions/log', { message: 'User clicked button', level: 'debug' });
+```
+
+
+### Step 2: Advanced Command Class
+```javascript
+class ElementManagerCommand extends $e.modules.CommandBase {
+    validateArgs(args) {
+        if (!args.action) {
+            throw new Error('Action is required (create, update, delete)');
+        }
+
+        if (args.action === 'create' && !args.elementType) {
+            throw new Error('Element type is required for create action');
+        }
+    }
+
+    apply(args) {
+        switch (args.action) {
+            case 'create':
+                return this.createElement(args);
+            case 'update':
+                return this.updateElement(args);
+            case 'delete':
+                return this.deleteElement(args);
+            default:
+                throw new Error(`Unknown action: ${args.action}`);
+        }
+    }
+
+    createElement(args) {
+        console.log(`Creating ${args.elementType} element`);
+
+        // Simulate element creation
+        const element = {
+            id: `element-${Date.now()}`,
+            type: args.elementType,
+            properties: args.properties || {},
+            created: new Date().toISOString()
+        };
+
+        return {
+            success: true,
+            element,
+            action: 'created'
+        };
+    }
+
+    updateElement(args) {
+        console.log(`Updating element ${args.elementId}`);
+
+        return {
+            success: true,
+            elementId: args.elementId,
+            changes: args.changes,
+            action: 'updated'
+        };
+    }
+
+    deleteElement(args) {
+        console.log(`Deleting element ${args.elementId}`);
+
+        return {
+            success: true,
+            elementId: args.elementId,
+            action: 'deleted'
+        };
+    }
+}
+
+// Register in component
+class ElementManagerComponent extends $e.modules.ComponentBase {
+    getNamespace() {
+        return 'element-manager';
+    }
+
+    defaultCommands() {
+        return {
+            'manage': ElementManagerCommand
+        };
+    }
+}
+```
+
+---
+
+
+## Command Lifecycle
+
+### Complete Lifecycle Flow
+```
+Command Execution Flow:
+┌─────────────────┐
+│ $e.run(command) │
+└─────────┬───────┘
+          │
+          ▼
+┌─────────────────┐
+│ validateRun()   │ ← Check if command exists & dependencies
+└─────────┬───────┘
+          │
+          ▼
+┌─────────────────┐
+│ beforeRun()     │ ← UI hooks, setup
+└─────────┬───────┘
+          │
+          ▼
+┌─────────────────┐
+│ onBeforeRun()   │ ← Command-specific setup
+└─────────┬───────┘
+          │
+          ▼
+┌─────────────────┐
+│ onBeforeApply() │ ← Data hooks, validation
+└─────────┬───────┘
+          │
+          ▼
+┌─────────────────┐
+│ apply()         │ ← Main command logic
+└─────────┬───────┘
+          │
+          ▼
+┌─────────────────┐
+│ onAfterApply()  │ ← Data hooks, cleanup
+└─────────┬───────┘
+          │
+          ▼
+┌─────────────────┐
+│ onAfterRun()    │ ← Command-specific cleanup
+└─────────┬───────┘
+          │
+          ▼
+┌─────────────────┐
+│ afterRun()      │ ← UI hooks, finalization
+└─────────────────┘
+```
+
+
+### Lifecycle Hooks Example
+```javascript
+class AdvancedCommand extends $e.modules.CommandBase {
+    // Called before any execution
+    onBeforeRun(args) {
+        console.log('🚀 Starting command:', this.command);
+        this.startTime = performance.now();
+    }
+
+    // Called before main logic
+    onBeforeApply(args) {
+        console.log('📋 Preparing to execute...');
+        this.validateBusinessLogic(args);
+    }
+
+    // Main command logic
+    apply(args) {
+        console.log('⚙️ Executing main logic...');
+
+        // Your command logic here
+        const result = this.performOperation(args);
+
+        return result;
+    }
+
+    // Called after main logic
+    onAfterApply(args, result) {
+        console.log('✅ Main logic completed');
+        this.logResult(result);
+    }
+
+    // Called after everything
+    onAfterRun(args, result) {
+        const duration = performance.now() - this.startTime;
+        console.log(`🏁 Command completed in ${duration.toFixed(2)}ms`);
+    }
+
+    // Called if there's an error
+    onCatchApply(error) {
+        console.error('❌ Command failed:', error);
+        this.cleanup();
+    }
+
+    // Helper methods
+    validateBusinessLogic(args) {
+        // Custom validation logic
+    }
+
+    performOperation(args) {
+        // Main operation
+        return { success: true };
+    }
+
+    logResult(result) {
+        // Result logging
+    }
+
+    cleanup() {
+        // Error cleanup
+    }
+}
+```
+
+---
+
+## Summary
+
+WebCli commands are the **action layer** of Elementor's JavaScript API. They provide:
+
+- **Structured Operations**: Organized, predictable way to perform actions
+- **Lifecycle Management**: Hooks for setup, execution, and cleanup
+- **Error Handling**: Robust error handling and recovery
+- **Performance**: Optimized execution with caching and batching
+- **Debugging**: Rich debugging and monitoring capabilities
+
+### Key Takeaways
+1. **Commands DO things** (actions) vs Routes GO places (navigation)
+2. **Use CommandBase** for full-featured commands with lifecycle hooks
+3. **Always validate arguments** to prevent errors
+4. **Return consistent structures** for predictable results
+5. **Handle errors gracefully** with proper error handling
+6. **Debug effectively** with built-in tools and utilities
+
+### Next Steps
+1. Create your first simple command
+2. Build a CommandBase class with lifecycle hooks
+3. Add error handling and validation
+4. Explore existing Elementor commands for inspiration
+5. Build complex workflows with command chaining
+
+**Remember**: Commands are the "verbs" of your Elementor application - they make things happen!

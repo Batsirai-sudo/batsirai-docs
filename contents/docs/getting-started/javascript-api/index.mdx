@@ -1,0 +1,47 @@
+---
+title: Javascript API
+description: This section provides an overview of AriaDocs.
+---
+
+## What is WebCli Module
+
+The WebCli module creates a comprehensive JavaScript-based API and command-line
+interface for Elementor that's accessible through the browser console.
+
+It exposes a global $e object that provides developers with powerful tools to interact with Elementor programmatically.
+
+## Core Functionality
+1. Global API Access: Creates window.$e - a global JavaScript object that developers can use in the browser
+console or scripts
+2. Command System: Provides a robust command infrastructure with:
+   - Public Commands ($e.commands) - For general operations
+   - Internal Commands ($e.commandsInternal) - For internal Elementor operations
+   - Data Commands ($e.data) - For data operations
+   - Command registration, execution, validation, and tracing
+   - Shortcut support for commands
+3. Component Architecture:
+   - Modular component system ($e.components)
+   - Component registration and management
+   - Modal components support
+4. Hooks System ($e.hooks): WordPress-style hooks for:
+   - Actions and filters
+   - UI hooks
+   - Data hooks
+5. Routing ($e.routes): Navigation and routing capabilities
+6. Data Management ($e.data): Centralized data operations
+7. State Management ($e.store, $e.uiStates): Application state management
+8. Utilities:
+   - Console logging with Elementor branding
+   - Shortcuts system
+   - Hash-based commands
+   - Backwards compatibility layer
+9. Developer Benefits
+   - This module essentially turns the browser console into a powerful debugging and development tool for Elementor, allowing developers to:
+   - Execute Elementor commands directly from the console
+   - Inspect and manipulate Elementor's internal state
+   - Test component functionality
+   - Debug issues with proper error handling and tracing
+   - Access Elementor's data layer programmatically
+   - Navigate between different Elementor views/routes
+
+<Outlet path="/getting-started/javascript-api" />

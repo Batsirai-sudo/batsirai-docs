@@ -14,6 +14,16 @@ export const ROUTES: EachRoute[] = [
     href: "/getting-started",
     noLink: true,
     items: [
+      {
+        title: "Javascript API",
+        href: "/javascript-api",
+        items: [
+          { title: "Component", href: "/component" },
+          { title: "Commands", href: "/commands" },
+          { title: "Routes", href: "/routes" },
+          { title: "Hooks", href: "/hooks" },
+        ]
+      },
       { title: "Introduction", href: "/introduction" },
       {
         title: "Installation",
