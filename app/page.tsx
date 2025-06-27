@@ -10,17 +10,14 @@ export default function Home() {
         href="#"
         className="mb-5 sm:text-lg flex items-center gap-2 underline underline-offset-4 sm:-mt-12"
       >
-        Follow along on GitHub{" "}
+       Clarity Fuels Creation. Confidence Drives Growth.
         <MoveUpRightIcon className="w-4 h-4 font-extrabold" />
       </Link>
       <h1 className="text-[1.80rem] leading-8 sm:px-8 md:leading-[4.5rem] font-bold mb-4 sm:text-6xl text-left sm:text-center">
         Batsirai Documentation
       </h1>
       <p className="mb-8 md:text-lg text-base  max-w-[1200px] text-muted-foreground text-left sm:text-center">
-        This feature-packed documentation template, built with multiple
-        frameworks including Next.js, React Router, and TanStack Router, offers
-        a sleek and responsive design, perfect for all your project
-        documentation needs.
+        This documentation serves as a personal knowledge base to help me understand and keep track of different concepts
       </p>
       <div className="sm:flex sm:flex-row grid grid-cols-2 items-center sm;gap-5 gap-3 mb-8">
         <Link
@@ -42,7 +39,7 @@ export default function Home() {
       </div>
       <span className="sm:flex hidden flex-row items-start sm:gap-2 gap-0.5 text-muted-foreground text-md mt-5 -mb-12 max-[800px]:mb-12 font-code sm:text-base text-sm font-medium">
         <TerminalSquareIcon className="w-5 h-5 sm:mr-1 mt-0.5" />
-        {"npx create-aria-doc <project-directory>"}
+        {"npx happy-coding <project-directory>"}
       </span>
     </div>
   );
